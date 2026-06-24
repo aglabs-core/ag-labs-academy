@@ -48,88 +48,26 @@ function Index() {
         />
       </div>
 
-      {/* Nav */}
-      <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-gradient-to-br from-[#22d3ee] to-[#a855f7] text-[11px] font-black text-black">
-            AG
-          </div>
-          <span className="text-sm font-semibold tracking-tight">
-            AG LABS <span className="text-white/50">· IA Academy</span>
-          </span>
-        </div>
-        <div className="hidden items-center gap-2 rounded-sm border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/60 md:flex">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-          Turma aberta · acesso gratuito
-        </div>
-      </header>
+      <main className="relative z-10 mx-auto flex max-w-xl flex-col items-center px-6 pb-24 pt-24 text-center">
+        <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl">
+          Desbloqueie o{" "}
+          <span className="bg-gradient-to-r from-[#22d3ee] via-[#60a5fa] to-[#a855f7] bg-clip-text text-transparent">
+            arsenal de automação
+          </span>{" "}
+          da AG LABS.
+        </h1>
 
-      <main className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 gap-12 px-6 pb-24 pt-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:pt-16">
-        {/* Left: pitch */}
-        <section>
-          <div className="inline-flex items-center gap-2 rounded-sm border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 backdrop-blur">
-            <span className="h-1 w-1 rounded-full bg-[#22d3ee]" />
-            Arsenal de Automação · v2026
-          </div>
+        <p className="mt-5 max-w-md text-balance text-base leading-relaxed text-white/60 md:text-lg">
+          Acesso imediato e gratuito a templates de IA e automações validadas
+          no campo de batalha.
+        </p>
 
-          <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
-            Desbloqueie o{" "}
-            <span className="bg-gradient-to-r from-[#22d3ee] via-[#60a5fa] to-[#a855f7] bg-clip-text text-transparent">
-              arsenal de automação
-            </span>{" "}
-            da AG LABS.
-          </h1>
-
-          <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-white/60 md:text-lg">
-            Acesso imediato e gratuito a templates de IA e automações validadas
-            no campo de batalha. Construa, implemente ou revenda projetos de
-            alto impacto.
-          </p>
-
-          <ul className="mt-10 space-y-3">
-            {[
-              { k: "01", t: "Templates plug-and-play", d: "Fluxos prontos para n8n, Make e agentes LLM." },
-              { k: "02", t: "Playbooks de venda", d: "Scripts e propostas para revender automações." },
-              { k: "03", t: "Comunidade ativa", d: "Suporte direto e reviews semanais de projetos." },
-            ].map((f) => (
-              <li
-                key={f.k}
-                className="group flex items-start gap-4 rounded-sm border border-white/[0.07] bg-white/[0.02] p-4 backdrop-blur transition hover:border-white/20 hover:bg-white/[0.04]"
-              >
-                <span className="font-mono text-xs text-white/40">{f.k}</span>
-                <div>
-                  <p className="text-sm font-semibold text-white">{f.t}</p>
-                  <p className="mt-0.5 text-sm text-white/55">{f.d}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-10 flex items-center gap-6 border-t border-white/10 pt-6">
-            <div>
-              <p className="text-2xl font-semibold tracking-tight">+12k</p>
-              <p className="text-xs text-white/50">alunos ativos</p>
-            </div>
-            <div className="h-8 w-px bg-white/10" />
-            <div>
-              <p className="text-2xl font-semibold tracking-tight">4.9★</p>
-              <p className="text-xs text-white/50">avaliação média</p>
-            </div>
-            <div className="h-8 w-px bg-white/10" />
-            <div>
-              <p className="text-2xl font-semibold tracking-tight">100%</p>
-              <p className="text-xs text-white/50">gratuito</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Right: form card */}
-        <section className="lg:pt-4">
+        <div className="mt-10 w-full">
           <div className="relative">
             <div className="absolute -inset-px rounded-sm bg-gradient-to-br from-[#22d3ee]/40 via-transparent to-[#a855f7]/40 opacity-60 blur-sm" />
             <form
               onSubmit={handleSubmit}
-              className="relative rounded-sm border border-white/10 bg-[#0c0c10]/90 p-6 backdrop-blur-xl md:p-8"
+              className="relative rounded-sm border border-white/10 bg-[#0c0c10]/90 p-6 text-left backdrop-blur-xl md:p-8"
             >
               <div className="mb-6 flex items-center justify-between">
                 <div>
@@ -230,7 +168,7 @@ function Index() {
               </p>
             </form>
           </div>
-        </section>
+        </div>
       </main>
 
       <footer className="relative z-10 border-t border-white/5 py-6 text-center text-xs text-white/40">
