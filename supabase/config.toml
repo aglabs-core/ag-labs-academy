@@ -1,0 +1,3 @@
+# Configuração da Supabase CLI.
+# project_id corresponde ao "ref" do projeto (VITE_SUPABASE_URL: https://<ref>.supabase.co)
+project_id = "udcsokdtdqqdnoqozbxh"

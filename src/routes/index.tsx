@@ -1,35 +1,95 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+
+import { supabase } from "../lib/supabase";
+
+const PAGE_TITLE = "Arsenal de Automação com IA — Kit gratuito | AG LABS IA Academy";
+const PAGE_DESCRIPTION =
+  "Receba gratuitamente o arsenal de templates de IA e automações validadas no campo de batalha pela AG LABS. Para quem quer automatizar a empresa ou trabalhar com IA.";
+
+// FAQ em JSON-LD: melhora SEO e a captação por mecanismos de resposta (AEO/GEO),
+// como Google AI Overviews, ChatGPT, Claude, Gemini e Perplexity.
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "O que é o arsenal de automação da AG LABS?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "É um kit gratuito com templates de IA e automações já validadas no dia a dia da AG LABS, prontos para você aplicar na sua empresa ou na sua carreira.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "O acesso é realmente gratuito?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Sim. O acesso ao kit é imediato e gratuito. Basta preencher seu nome, e-mail e WhatsApp para liberar o material.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Para quem é indicado?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Para quem quer automatizar a própria empresa com inteligência artificial e para quem deseja trabalhar profissionalmente com IA e automação.",
+      },
+    },
+  ],
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AG LABS IA Academy — Arsenal de Automação" },
+      { title: PAGE_TITLE },
+      { name: "description", content: PAGE_DESCRIPTION },
+      { property: "og:title", content: PAGE_TITLE },
+      { property: "og:description", content: PAGE_DESCRIPTION },
+      { name: "twitter:title", content: PAGE_TITLE },
+      { name: "twitter:description", content: PAGE_DESCRIPTION },
+    ],
+    scripts: [
       {
-        name: "description",
-        content:
-          "Acesso imediato e gratuito a templates de IA e automações validadas no campo de batalha pela AG LABS IA Academy.",
-      },
-      { property: "og:title", content: "AG LABS IA Academy — Arsenal de Automação" },
-      {
-        property: "og:description",
-        content:
-          "Acesso imediato e gratuito a templates de IA e automações validadas no campo de batalha.",
+        type: "application/ld+json",
+        children: JSON.stringify(faqLd),
       },
     ],
   }),
   component: Index,
 });
 
+const EMPTY_FORM = { nome: "", email: "", whatsapp: "", objetivo: "" };
+
 function Index() {
-  const [form, setForm] = useState({ nome: "", email: "", whatsapp: "", objetivo: "" });
+  const navigate = useNavigate();
+  const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log("submit", form);
-    setTimeout(() => setLoading(false), 800);
+    setErrorMessage(null);
+
+    const { error } = await supabase.from("leads_institucional").insert({
+      nome: form.nome.trim(),
+      email: form.email.trim().toLowerCase(),
+      whatsapp: form.whatsapp.trim(),
+      objetivo: form.objetivo,
+    });
+
+    if (error) {
+      setLoading(false);
+      console.error("Erro ao salvar lead", error);
+      setErrorMessage("Não foi possível enviar agora. Tente novamente em instantes.");
+      return;
+    }
+
+    // Cadastro salvo — leva o usuário à página de entrega do bônus.
+    setForm(EMPTY_FORM);
+    navigate({ to: "/acesso" });
   };
 
   return (
@@ -58,8 +118,7 @@ function Index() {
         </h1>
 
         <p className="mt-5 max-w-md text-balance text-base leading-relaxed text-white/60 md:text-lg">
-          Acesso imediato e gratuito a templates de IA e automações validadas
-          no campo de batalha.
+          Acesso imediato e gratuito a templates de IA e automações validadas no campo de batalha.
         </p>
 
         <div className="mt-10 w-full">
@@ -100,9 +159,7 @@ function Index() {
                 />
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/70">
-                    WhatsApp
-                  </label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/70">WhatsApp</label>
                   <div className="flex items-stretch overflow-hidden rounded-sm border border-white/10 bg-white/[0.03] transition focus-within:border-brand/60 focus-within:bg-white/[0.05]">
                     <span className="border-r border-white/10 px-3 py-2.5 text-sm text-white/50">
                       +55
@@ -162,9 +219,18 @@ function Index() {
                 </svg>
               </button>
 
+              {errorMessage && (
+                <p
+                  role="alert"
+                  className="mt-4 rounded-sm border border-red-500/40 bg-red-500/10 px-3 py-2.5 text-center text-xs text-red-300"
+                >
+                  {errorMessage}
+                </p>
+              )}
+
               <p className="mt-4 text-center text-[11px] text-white/40">
-                Ao continuar você concorda em receber comunicações da AG LABS.
-                Sem spam — cancele quando quiser.
+                Ao continuar você concorda em receber comunicações da AG LABS. Sem spam — cancele
+                quando quiser.
               </p>
             </form>
           </div>

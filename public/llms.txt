@@ -1,0 +1,27 @@
+# AG LABS IA Academy
+
+> Landing page de captação da AG LABS IA Academy. Oferece, de forma gratuita, um
+> "arsenal de automação": templates de IA e automações já validadas no campo de
+> batalha. Público-alvo: empresas que querem automatizar processos com IA e
+> pessoas que querem trabalhar com IA e automação.
+
+## Sobre
+
+- **Marca:** AG LABS IA Academy
+- **Site:** https://bonus.aglabs.ia.br
+- **Oferta:** Kit gratuito de templates de IA e automações
+- **Como obter:** preencher o formulário com nome, e-mail e WhatsApp na página inicial
+- **Idioma:** Português (Brasil)
+
+## Perguntas frequentes
+
+- **O que é o arsenal de automação?** Um kit gratuito com templates de IA e
+  automações prontas para aplicar na empresa ou na carreira.
+- **É gratuito?** Sim, o acesso é imediato e gratuito.
+- **Para quem é?** Para quem quer automatizar a empresa com IA e para quem quer
+  trabalhar profissionalmente com IA e automação.
+
+## Páginas
+
+- [Página inicial](https://bonus.aglabs.ia.br/): apresentação da oferta e
+  formulário de acesso ao kit gratuito.
