@@ -23,20 +23,30 @@ const OG_IMAGE = `${SITE_URL}/og-image.png`;
 const organizationLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: SITE_NAME,
-  url: SITE_URL,
+  "@id": "https://aglabs.ia.br/#organization",
+  name: "AG LABS Intelligence",
+  alternateName: "AG LABS",
+  url: "https://aglabs.ia.br/",
   logo: `${SITE_URL}/android-chrome-512x512.png`,
-  description: SITE_DESCRIPTION,
-  sameAs: [] as string[],
+  description:
+    "Empresa brasileira de inteligência artificial aplicada a negócios: agentes de IA, automação de processos e websites de alto desempenho.",
+  sameAs: [
+    "https://www.facebook.com/profile.php?id=61573483665476",
+    "https://www.instagram.com/ag_labs/",
+    "https://x.com/aglabsrv",
+    "https://www.linkedin.com/company/ag-labs",
+  ],
 };
 
 const websiteLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": `${SITE_URL}/#website`,
   name: SITE_NAME,
   url: SITE_URL,
   inLanguage: "pt-BR",
   description: SITE_DESCRIPTION,
+  publisher: { "@id": "https://aglabs.ia.br/#organization" },
 };
 
 function NotFoundComponent() {

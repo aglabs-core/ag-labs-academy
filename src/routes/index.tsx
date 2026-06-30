@@ -229,8 +229,16 @@ function Index() {
               )}
 
               <p className="mt-4 text-center text-[11px] text-white/40">
-                Ao continuar você concorda em receber comunicações da AG LABS. Sem spam — cancele
-                quando quiser.
+                Ao continuar você concorda em receber comunicações da AG LABS e com a{" "}
+                <a
+                  href="https://aglabs.ia.br/politica-de-privacidade"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline transition-colors hover:text-white/70"
+                >
+                  Política de Privacidade
+                </a>
+                . Sem spam — cancele quando quiser.
               </p>
             </form>
           </div>
