@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 
-import { supabase } from "../lib/supabase";
+import { captureLead, type LeadInput, validateLeadInput } from "../lib/lead-capture";
 
 const PAGE_TITLE = "Arsenal de Automação com IA — Kit gratuito | AG LABS IA Academy";
 const PAGE_DESCRIPTION =
@@ -60,36 +61,45 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const EMPTY_FORM = { nome: "", email: "", whatsapp: "", objetivo: "" };
+const EMPTY_FORM: LeadInput = { nome: "", email: "", whatsapp: "", objetivo: "" };
 
 function Index() {
   const navigate = useNavigate();
+  const captureLeadFn = useServerFn(captureLead);
   const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setErrorMessage(null);
 
-    const { error } = await supabase.from("leads_institucional").insert({
-      nome: form.nome.trim(),
-      email: form.email.trim().toLowerCase(),
-      whatsapp: form.whatsapp.trim(),
-      objetivo: form.objetivo,
-    });
-
-    if (error) {
-      setLoading(false);
-      console.error("Erro ao salvar lead", error);
-      setErrorMessage("Não foi possível enviar agora. Tente novamente em instantes.");
+    const parsed = validateLeadInput(form);
+    if (!parsed.ok) {
+      setErrorMessage(parsed.message);
       return;
     }
 
-    // Cadastro salvo — leva o usuário à página de entrega do bônus.
-    setForm(EMPTY_FORM);
-    navigate({ to: "/acesso" });
+    setLoading(true);
+
+    try {
+      const result = await captureLeadFn({ data: parsed.data });
+
+      if (!result.ok) {
+        setErrorMessage(result.message);
+        return;
+      }
+
+      setForm(EMPTY_FORM);
+      await navigate({ to: "/acesso" });
+    } catch (error) {
+      console.error("Falha ao enviar formulário de lead.", error);
+      setErrorMessage(
+        "Não foi possível concluir seu cadastro agora. Verifique sua conexão e tente novamente.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -147,15 +157,21 @@ function Index() {
                   label="Nome completo"
                   type="text"
                   placeholder="Seu nome e sobrenome"
+                  autoComplete="name"
+                  maxLength={120}
+                  disabled={loading}
                   value={form.nome}
-                  onChange={(v) => setForm({ ...form, nome: v })}
+                  onChange={(v) => setForm((current) => ({ ...current, nome: v }))}
                 />
                 <Field
                   label="E-mail"
                   type="email"
                   placeholder="voce@empresa.com"
+                  autoComplete="email"
+                  maxLength={254}
+                  disabled={loading}
                   value={form.email}
-                  onChange={(v) => setForm({ ...form, email: v })}
+                  onChange={(v) => setForm((current) => ({ ...current, email: v }))}
                 />
 
                 <div>
@@ -167,9 +183,15 @@ function Index() {
                     <input
                       type="tel"
                       required
+                      autoComplete="tel-national"
+                      inputMode="tel"
+                      maxLength={20}
+                      disabled={loading}
                       placeholder="(11) 90000-0000"
                       value={form.whatsapp}
-                      onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+                      onChange={(e) =>
+                        setForm((current) => ({ ...current, whatsapp: e.target.value }))
+                      }
                       className="flex-1 bg-transparent px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none"
                     />
                   </div>
@@ -181,8 +203,11 @@ function Index() {
                   </label>
                   <select
                     required
+                    disabled={loading}
                     value={form.objetivo}
-                    onChange={(e) => setForm({ ...form, objetivo: e.target.value })}
+                    onChange={(e) =>
+                      setForm((current) => ({ ...current, objetivo: e.target.value }))
+                    }
                     className="w-full rounded-sm border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white transition focus:border-brand/60 focus:bg-white/[0.05] focus:outline-none"
                   >
                     <option value="" className="bg-[#0c0c10]">
@@ -201,6 +226,7 @@ function Index() {
               <button
                 type="submit"
                 disabled={loading}
+                aria-busy={loading}
                 className="group relative mt-6 flex w-full items-center justify-center gap-2 overflow-hidden rounded-sm bg-gradient-to-r from-brand to-brand-dim px-5 py-3.5 text-sm font-semibold text-[#08080b] transition hover:brightness-110 disabled:opacity-60"
               >
                 <span className="relative">
@@ -256,12 +282,18 @@ function Field({
   label,
   type,
   placeholder,
+  autoComplete,
+  maxLength,
+  disabled,
   value,
   onChange,
 }: {
   label: string;
   type: string;
   placeholder: string;
+  autoComplete: string;
+  maxLength: number;
+  disabled: boolean;
   value: string;
   onChange: (v: string) => void;
 }) {
@@ -271,6 +303,9 @@ function Field({
       <input
         type={type}
         required
+        autoComplete={autoComplete}
+        maxLength={maxLength}
+        disabled={disabled}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}

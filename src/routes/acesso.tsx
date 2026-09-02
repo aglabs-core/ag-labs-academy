@@ -1,11 +1,18 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, FolderOpen } from "lucide-react";
+
+import { hasBonusAccess } from "../lib/lead-capture";
 
 // Pasta do Google Drive com os workflows entregues como bônus.
 const DRIVE_URL =
   "https://drive.google.com/drive/folders/1ROUwflqTHNcQuupegc24q9PWD69ISzrs?usp=drive_link";
 
 export const Route = createFileRoute("/acesso")({
+  beforeLoad: async () => {
+    if (!(await hasBonusAccess())) {
+      throw redirect({ to: "/" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Acesso liberado — AG LABS IA Academy" },
@@ -106,8 +113,8 @@ function Acesso() {
         </div>
 
         <p className="mt-8 max-w-md text-sm text-white/50">
-          Também enviamos o acesso para o seu e-mail e WhatsApp. Fique de olho na caixa de entrada
-          (e no spam).
+          Seu acesso fica disponível neste dispositivo por 30 dias. Salve uma cópia dos materiais
+          no seu Google Drive para consultar quando quiser.
         </p>
 
         <Link
