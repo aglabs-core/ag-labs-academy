@@ -1,6 +1,6 @@
 # AG LABS IA Academy
 
-Landing page de captação de leads (TanStack Start + React 19 + Vite + Tailwind).
+Landing page de captação de leads (TanStack Start + React 19 + Vite + Tailwind)
 Produção: https://bonus.aglabs.ia.br
 
 ## Stack
