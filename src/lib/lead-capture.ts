@@ -18,9 +18,7 @@ type ValidatedLeadInput = Omit<LeadInput, "objetivo"> & {
   objetivo: "automatizar" | "trabalhar";
 };
 
-type LeadValidationResult =
-  | { ok: true; data: ValidatedLeadInput }
-  | { ok: false; message: string };
+type LeadValidationResult = { ok: true; data: ValidatedLeadInput } | { ok: false; message: string };
 
 export function validateLeadInput(input: unknown): LeadValidationResult {
   if (!input || typeof input !== "object") {
@@ -42,9 +40,7 @@ export function validateLeadInput(input: unknown): LeadValidationResult {
 
   const hasValidWhatsappLength =
     (whatsappDigits.length >= 10 && whatsappDigits.length <= 11) ||
-    (whatsappDigits.startsWith("55") &&
-      whatsappDigits.length >= 12 &&
-      whatsappDigits.length <= 13);
+    (whatsappDigits.startsWith("55") && whatsappDigits.length >= 12 && whatsappDigits.length <= 13);
 
   if (!hasValidWhatsappLength) {
     return { ok: false, message: "Informe um WhatsApp válido com DDD." };
@@ -72,6 +68,17 @@ type CaptureLeadResult =
       message: string;
     };
 
+type SupabaseInsertError = {
+  code?: string;
+  message?: string;
+};
+
+function isLegacyLeadSchemaError(error: SupabaseInsertError | null): boolean {
+  if (!error || error.code !== "PGRST204") return false;
+
+  return /'(nome|objetivo)' column/.test(error.message ?? "");
+}
+
 export const captureLead = createServerFn({ method: "POST" })
   .validator((input: unknown) => {
     const result = validateLeadInput(input);
@@ -97,12 +104,25 @@ export const captureLead = createServerFn({ method: "POST" })
         auth: { persistSession: false, autoRefreshToken: false },
       });
 
-      const { error } = await supabase.from("leads_institucional").insert({
+      let { error } = await supabase.from("leads_institucional").insert({
         nome: data.nome,
         email: data.email,
         whatsapp: data.whatsapp,
         objetivo: data.objetivo,
       });
+
+      // Algumas instalações antigas da tabela possuem `notes`, mas não
+      // `nome`/`objetivo`. Mantemos a captura operacional até a migração de
+      // reconciliação ser aplicada, sem perder esses dados do formulário.
+      if (isLegacyLeadSchemaError(error)) {
+        console.warn("Esquema legado de leads detectado; usando campo notes.");
+        const legacyInsert = await supabase.from("leads_institucional").insert({
+          email: data.email,
+          whatsapp: data.whatsapp,
+          notes: `Nome: ${data.nome}\nObjetivo: ${data.objetivo}\nOrigem: bonus.aglabs.ia.br`,
+        });
+        error = legacyInsert.error;
+      }
 
       if (error) {
         console.error("Falha ao registrar lead no Supabase.", {
