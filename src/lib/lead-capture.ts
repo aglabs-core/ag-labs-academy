@@ -12,11 +12,33 @@ export type LeadInput = {
   email: string;
   whatsapp: string;
   objetivo: string;
+  utm?: Partial<Record<"source" | "medium" | "campaign" | "content", string>>;
 };
 
-type ValidatedLeadInput = Omit<LeadInput, "objetivo"> & {
+type ValidatedLeadInput = Omit<LeadInput, "objetivo" | "utm"> & {
   objetivo: "automatizar" | "trabalhar";
+  /** UTMs saneadas da URL de entrada, ex.: "utm_source=instagram; utm_campaign=nod". */
+  origem: string;
 };
+
+const UTM_KEYS = ["source", "medium", "campaign", "content"] as const;
+
+/** Mantém só letras, números, ponto, hífen e sublinhado (até 60 caracteres por parâmetro). */
+export function formatUtm(utm: unknown): string {
+  if (!utm || typeof utm !== "object") return "";
+  const partes: string[] = [];
+  for (const chave of UTM_KEYS) {
+    const valor = (utm as Record<string, unknown>)[chave];
+    if (typeof valor !== "string") continue;
+    const limpo = valor
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_.-]/g, "")
+      .slice(0, 60);
+    if (limpo) partes.push(`utm_${chave}=${limpo}`);
+  }
+  return partes.join("; ");
+}
 
 type LeadValidationResult = { ok: true; data: ValidatedLeadInput } | { ok: false; message: string };
 
@@ -57,6 +79,7 @@ export function validateLeadInput(input: unknown): LeadValidationResult {
       email,
       whatsapp: `+${whatsappDigits.startsWith("55") ? whatsappDigits : `55${whatsappDigits}`}`,
       objetivo,
+      origem: formatUtm(candidate.utm),
     },
   };
 }
@@ -109,6 +132,7 @@ export const captureLead = createServerFn({ method: "POST" })
         email: data.email,
         whatsapp: data.whatsapp,
         objetivo: data.objetivo,
+        notes: data.origem ? `Origem: bonus.aglabs.ia.br\n${data.origem}` : null,
       });
 
       // Algumas instalações antigas da tabela possuem `notes`, mas não
@@ -119,7 +143,7 @@ export const captureLead = createServerFn({ method: "POST" })
         const legacyInsert = await supabase.from("leads_institucional").insert({
           email: data.email,
           whatsapp: data.whatsapp,
-          notes: `Nome: ${data.nome}\nObjetivo: ${data.objetivo}\nOrigem: bonus.aglabs.ia.br`,
+          notes: `Nome: ${data.nome}\nObjetivo: ${data.objetivo}\nOrigem: bonus.aglabs.ia.br${data.origem ? `\n${data.origem}` : ""}`,
         });
         error = legacyInsert.error;
       }
