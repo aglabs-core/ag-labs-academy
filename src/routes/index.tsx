@@ -74,7 +74,16 @@ function Index() {
     e.preventDefault();
     setErrorMessage(null);
 
-    const parsed = validateLeadInput(form);
+    // Origem do cadastro: UTMs da URL de entrada (ex.: link da bio ou do post).
+    const params = new URLSearchParams(window.location.search);
+    const utm = {
+      source: params.get("utm_source") ?? undefined,
+      medium: params.get("utm_medium") ?? undefined,
+      campaign: params.get("utm_campaign") ?? undefined,
+      content: params.get("utm_content") ?? undefined,
+    };
+
+    const parsed = validateLeadInput({ ...form, utm });
     if (!parsed.ok) {
       setErrorMessage(parsed.message);
       return;
@@ -83,7 +92,7 @@ function Index() {
     setLoading(true);
 
     try {
-      const result = await captureLeadFn({ data: parsed.data });
+      const result = await captureLeadFn({ data: { ...parsed.data, utm } });
 
       if (!result.ok) {
         setErrorMessage(result.message);
