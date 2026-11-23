@@ -15,6 +15,11 @@ Produção: https://bonus.aglabs.ia.br
 - `bun dev` — servidor de desenvolvimento
 - `bun run build` — build de produção (Nitro gera `.vercel/output` via Build Output API)
 - `bun run lint` / `bun run format`
+- `bun run tsc --noEmit` — verificação de tipos
+
+O workflow `quality.yml` verifica lint, tipos e build nos PRs e na `main`,
+com Node 22, Bun 1.3.14 e as versões do `bun.lock`. A publicação é feita
+pela integração Git da Vercel.
 
 ## Deploy (Vercel)
 
