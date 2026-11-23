@@ -113,8 +113,8 @@ function Acesso() {
         </div>
 
         <p className="mt-8 max-w-md text-sm text-white/50">
-          Seu acesso fica disponível neste dispositivo por 30 dias. Salve uma cópia dos materiais
-          no seu Google Drive para consultar quando quiser.
+          Seu acesso fica disponível neste dispositivo por 30 dias. Salve uma cópia dos materiais no
+          seu Google Drive para consultar quando quiser.
         </p>
 
         <Link
